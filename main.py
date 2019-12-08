@@ -20,8 +20,8 @@ class FullScreenApp(object):
         style = ttk.Style(root)
         style.theme_use('classic')
         style.configure('TFrame', background='black')
-        style.configure('TLabel', background='black', foreground='red', font=('Helvetica', '60'))
-        style.configure('info.TLabel', font=('Helvetica', '40'))
+        style.configure('TLabel', background='black', foreground='red', font=('Arial', '60'))
+        style.configure('info.TLabel', font=('Arial', '40'))
         style.configure('count.TLabel', font=('Seven Segment', '400'))
 
         # Create frames to have a black background with padding
@@ -31,7 +31,7 @@ class FullScreenApp(object):
         frame.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES, padx=50, pady=50)
 
         # Create a small label to have static text
-        lbl = ttk.Label(frame, text="Quakes Located by the NGMC:")
+        lbl = ttk.Label(frame, text="Earthquakes located by the NGMC:")
         lbl.pack(side=tk.TOP, fill=tk.X, expand=tk.NO)
 
         # Create the large label to contain quake count
