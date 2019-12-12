@@ -53,36 +53,39 @@ class FullScreenApp(object):
 
     def getquakes(self):
         # Blocking I/O request in a GUI thread - naughty :D
-        r = requests.get("https://quakesearch.geonet.org.nz/count?startdate=2018-12-12T1:00:00")
+        r = requests.get("https://quakesearch.geonet.org.nz/count?startdate=2018-12-12T1:00:00", timeout=10)
 
         if r.status_code != 200:
             self.drawcounttext("ERROR")
             print("ERROR: Failed to retrieve quake count (status: %d):" % r.status_code)
             print(r.text)
+            self.master.after(5000, self.getquakes)
             return
 
         data = r.json()
         c = data["count"]
         self.drawcounttext(c)
-        self.master.after(5000, self.getquakes)
 
         if c <= self.lastquakecount:
+            self.master.after(5000, self.getquakes)
             return
 
         self.lastquakecount = c
 
         # Get latest quake details:
-        r = requests.get("https://api.geonet.org.nz/quake?MMI=-1")
+        r = requests.get("https://api.geonet.org.nz/quake?MMI=-1", timeout=10)
 
         if r.status_code != 200:
             self.drawcounttext("ERROR")
             print("ERROR: Failed to retrieve quake info (status: %d):" % r.status_code)
             print(r.text)
+            self.master.after(5000, self.getquakes)
             return
 
         data = r.json()
         self.drawinfotext("Latest Quake:\nMagnitude %.1f, %s" % (
             data["features"][0]["properties"]["magnitude"], data["features"][0]["properties"]["locality"]))
+        self.master.after(5000, self.getquakes)
 
     def exit(self, event):
         self.master.destroy()
