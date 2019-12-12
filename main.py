@@ -52,14 +52,19 @@ class FullScreenApp(object):
         self.infolbl.config(text=todisplay)
 
     def getquakes(self):
+        self.master.after(10000, self.getquakes)
         # Blocking I/O request in a GUI thread - naughty :D
-        r = requests.get("https://quakesearch.geonet.org.nz/count?startdate=2018-12-12T1:00:00", timeout=10)
+        try:
+            r = requests.get("https://quakesearch.geonet.org.nz/count?startdate=2018-12-12T1:00:00", timeout=1)
+        except Exception as e:
+            self.drawcounttext("ERROR")
+            print(e)
+            return
 
         if r.status_code != 200:
             self.drawcounttext("ERROR")
             print("ERROR: Failed to retrieve quake count (status: %d):" % r.status_code)
             print(r.text)
-            self.master.after(5000, self.getquakes)
             return
 
         data = r.json()
@@ -67,19 +72,22 @@ class FullScreenApp(object):
         self.drawcounttext(c)
 
         if c <= self.lastquakecount:
-            self.master.after(5000, self.getquakes)
             return
 
         self.lastquakecount = c
 
         # Get latest quake details:
-        r = requests.get("https://api.geonet.org.nz/quake?MMI=-1", timeout=10)
+        try:
+            r = requests.get("https://api.geonet.org.nz/quake?MMI=-1", timeout=1)
+        except Exception as e:
+            self.drawcounttext("ERROR")
+            print(e)
+            return
 
         if r.status_code != 200:
             self.drawcounttext("ERROR")
             print("ERROR: Failed to retrieve quake info (status: %d):" % r.status_code)
             print(r.text)
-            self.master.after(5000, self.getquakes)
             return
 
         data = r.json()
